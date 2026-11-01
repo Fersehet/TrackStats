@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en" class="demo">
+<head>
+<meta charset="utf-8">
+<title>TrackStats – Demo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { font-family: "Roboto", "Segoe UI", Arial, sans-serif; }
+  #wx { font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif; }
+  html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; font-family: "Roboto", "Segoe UI", Arial, sans-serif; color: #e8f1f7; }
+  #panel { position: absolute; top: 0; left: 0; transform-origin: 0 0; width: 270px; padding: 12px 14px 10px; background: rgba(var(--rgb, 15, 19, 20), var(--bg, 1)); border-radius: 10px; box-sizing: border-box; }
+  #wx { position: absolute; top: 12px; right: 14px; font-size: 22px; line-height: 1.1; }
+  #level { font-size: 22px; font-weight: 700; line-height: 1.1; }
+  #trend { font-size: 13px; min-height: 17px; margin-top: 3px; color: #9fb3c2; }
+  #trend.up { color: #ff8a65; }
+  #trend.down { color: #7bd88f; }
+  #bar { display: flex; gap: 4px; margin: 10px 0 12px; }
+  #bar i { flex: 1; height: 10px; border-radius: 3px; background: #1d2a35; }
+  #bar i.on { background: var(--c); }
+  .row { display: flex; justify-content: space-between; font-size: 14px; padding: 2px 0; font-variant-numeric: tabular-nums; }
+  .row span:first-child { color: #9fb3c2; }
+  #wind { display: flex; align-items: center; gap: 8px; }
+  #arrow { transition: transform .3s; }
+  html.demo body { background: #16191d; overflow: auto; }
+  html.demo #panel { position: relative; margin: 32px auto; transform: none !important; }
+  #status { margin-top: 8px; font-size: 11px; color: #6c808f; }
+  #ctrl { width: 270px; margin: 0 auto 32px; color: #9fb3c2; font-size: 13px; }
+  #ctrl input[type=range] { width: 100%; margin: 8px 0 4px; accent-color: #5bb6ec; }
+  #ctrl .lbl { display: flex; justify-content: space-between; }
+  #ctrl button { margin-top: 10px; width: 100%; padding: 8px; border: 0; border-radius: 6px; background: #1d2a35; color: #e8f1f7; font-size: 13px; cursor: pointer; }
+  #ctrl button:hover { background: #26384a; }
+</style>
+</head>
+<body>
+<div id="panel">
+  <div id="wx"></div>
+  <div id="level">Waiting for iRacing…</div>
+  <div id="trend"></div>
+  <div id="bar"></div>
+  <div class="row"><span>Rain</span><span id="rain">–</span></div>
+  <div class="row"><span>Humidity</span><span id="hum">–</span></div>
+  <div class="row"><span>Wind</span><span id="wind"><svg id="arrow" viewBox="-12 -12 24 24" width="22" height="22"><path d="M0 -10 L7 8 L0 4 L-7 8 Z" fill="#8fd3f4"/></svg><b id="wspd">–</b></span></div>
+  <div class="row"><span>Track usage</span><span id="rubber">–</span></div>
+  <div id="status">Demo – simulated data</div>
+</div>
+<div id="ctrl">
+  <div class="lbl"><span>Track wetness</span><span id="slval">1</span></div>
+  <input type="range" id="slider" min="1" max="7" step="1" value="1">
+  <div class="lbl"><span>Dry</span><span>Extremely wet</span></div>
+  <div class="lbl" style="margin-top:14px"><span>Sky</span><span id="skval">Clear</span></div>
+  <input type="range" id="skysl" min="0" max="3" step="1" value="0">
+  <div class="lbl"><span>Clear</span><span>Overcast</span></div>
+  <div class="lbl" style="margin-top:14px"><span>Rain</span><span id="rnval">0 %</span></div>
+  <input type="range" id="rainsl" min="0" max="100" step="1" value="0">
+  <div class="lbl"><span>None</span><span>Heavy</span></div>
+  <button id="auto">Auto demo: on (click to pause)</button>
+</div>
+
+<script>
+(function () {
+  // iRacing: 1 = dry ... 7 = extremely wet
+  var LABELS = ["Unknown", "Dry", "Mostly dry", "Very lightly wet", "Lightly wet", "Moderately wet", "Very wet", "Extremely wet"];
+  var COLORS = ["#8fd3f4", "#5bb6ec", "#3b9be0", "#2f7fd1", "#3a63c4", "#4a49b0"]; // levels 2..7
+  // Background opacity via link: ?opacity=0.5 or ?opacity=50 (0 = transparent, 1 / 100 = fully solid)
+  var om = location.search.match(/[?&]opacity=([0-9.]+)/);
+  if (om) {
+    var ov = parseFloat(om[1]);
+    if (ov > 1) ov = ov / 100;
+    if (isFinite(ov)) document.documentElement.style.setProperty("--bg", Math.min(1, Math.max(0, ov)));
+  }
+  // Background color via link: ?color=0f1314 (hex, without #). Default matches the KAPPS Relatives overlay.
+  var cm = location.search.match(/[?&]color=#?([0-9a-fA-F]{6})/);
+  if (cm) {
+    var cv = parseInt(cm[1], 16);
+    document.documentElement.style.setProperty("--rgb", ((cv >> 16) & 255) + "," + ((cv >> 8) & 255) + "," + (cv & 255));
+  }
+  var NORTH = /[?&]norden=1/.test(location.search); // arrow points north instead of relative to the car
+  var FLIP = /[?&]flip=1/.test(location.search);   // reverse rotation if the arrow is mirrored
+
+  var state = {}, prevLevel = null, trend = 0;
+  var $ = function (id) { return document.getElementById(id); };
+
+  var bar = $("bar");
+  for (var i = 0; i < 6; i++) bar.appendChild(document.createElement("i"));
+
+  // Finds a key anywhere in the JSON so the overlay copes with different message formats
+  function find(obj, key, depth) {
+    if (obj === null || typeof obj !== "object" || (depth || 0) > 4) return undefined;
+    if (Object.prototype.hasOwnProperty.call(obj, key)) return normalize(obj[key]);
+    for (var k in obj) {
+      var r = find(obj[k], key, (depth || 0) + 1);
+      if (r !== undefined) return r;
+    }
+    return undefined;
+  }
+  function normalize(v) {
+    if (Array.isArray(v)) return normalize(v[0]);
+    if (v && typeof v === "object" && "value" in v) return v.value;
+    return v;
+  }
+
+  // Track usage = rubber state of the current session (from the iRacing session info)
+  function raw(obj, key, d) {
+    if (obj === null || typeof obj !== "object" || (d || 0) > 4) return undefined;
+    if (Object.prototype.hasOwnProperty.call(obj, key)) return obj[key];
+    for (var k in obj) { var r = raw(obj[k], key, (d || 0) + 1); if (r !== undefined) return r; }
+    return undefined;
+  }
+  function trackUsage() {
+    var si = state.SessionInfo, n = Number(state.SessionNum) || 0, v;
+    if (typeof si === "string") {
+      var m = si.match(/SessionTrackRubberState:[ \t]*[^\r\n]+/g) || [];
+      if (m.length) v = (m[Math.min(n, m.length - 1)]).replace(/SessionTrackRubberState:[ \t]*/, "");
+    } else if (si) {
+      var ss = raw(si, "Sessions");
+      if (Array.isArray(ss) && ss.length) {
+        var cur = ss.filter(function (x) { return x && Number(x.SessionNum) === n; })[0] || ss[Math.min(n, ss.length - 1)];
+        if (cur) v = cur.SessionTrackRubberState;
+      } else {
+        v = raw(si, "SessionTrackRubberState");
+      }
+    }
+    if (typeof v !== "string" || !v) return "–";
+    v = v.trim();
+    return v.charAt(0).toUpperCase() + v.slice(1);
+  }
+
+  function render() {
+    var lvl = Math.round(Number(state.TrackWetness));
+    if (!(lvl >= 0 && lvl <= 7)) lvl = 0;
+
+    if (prevLevel !== null && lvl !== prevLevel && lvl > 0 && prevLevel > 0) trend = lvl > prevLevel ? 1 : -1;
+    if (lvl > 0) prevLevel = lvl;
+
+    $("level").textContent = state.TrackWetness === undefined ? "Waiting for iRacing…" : LABELS[lvl];
+    var t = $("trend");
+    t.className = trend > 0 ? "up" : trend < 0 ? "down" : "";
+    t.textContent = trend > 0 ? "▲ getting wetter" : trend < 0 ? "▼ drying" : "";
+
+    var segs = bar.children;
+    for (var i = 0; i < 6; i++) {
+      var on = lvl >= i + 2;
+      segs[i].className = on ? "on" : "";
+      segs[i].style.setProperty("--c", COLORS[i]);
+    }
+
+    var p = Number(state.Precipitation), h = Number(state.RelativeHumidity);
+    $("rain").textContent = isFinite(p) && state.Precipitation !== undefined ? Math.round(p * 100) + " %" : "–";
+    $("hum").textContent = isFinite(h) && state.RelativeHumidity !== undefined ? Math.round(h * 100) + " %" : "–";
+    var wd = Number(state.WindDir), wv = Number(state.WindVel), yaw = Number(state.YawNorth) || 0;
+    if (state.WindVel !== undefined && isFinite(wv)) {
+      $("wspd").textContent = Math.round(wv * 3.6) + " km/h";
+      if (state.WindDir !== undefined && isFinite(wd)) {
+        // WindDir = direction the wind comes from; arrow shows where it blows to
+        var rel = NORTH ? wd : wd - yaw;
+        var deg = (FLIP ? -1 : 1) * rel * 180 / Math.PI + 180;
+        $("arrow").style.transform = "rotate(" + deg + "deg)";
+      }
+    }
+    $("rubber").textContent = trackUsage();
+    // Weather emoji: rain if it is currently raining, otherwise by cloud cover (Skies 0-3)
+    var sk = Number(state.Skies), pr = Number(state.Precipitation), em = "";
+    if (state.Precipitation !== undefined && isFinite(pr) && pr >= 0.05) em = "🌧️";
+    else if (state.Skies !== undefined && isFinite(sk)) em = ["☀️", "🌤️", "⛅", "☁️"][Math.min(3, Math.max(0, Math.round(sk)))];
+    $("wx").textContent = em;
+  }
+
+  function setStatus(s) { $("status").textContent = s; }
+
+
+  // ---- Demo: simulated weather, no iRacing needed ----
+  var scenes = [
+    { w: 1, sk: 0, pr: 0,   hum: .42, wv: 2.2, wd: .5,  u: "carry over" },
+    { w: 2, sk: 1, pr: 0,   hum: .51, wv: 3.0, wd: .7,  u: "low usage" },
+    { w: 3, sk: 2, pr: .08, hum: .63, wv: 4.4, wd: 1.0, u: "low usage" },
+    { w: 4, sk: 3, pr: .25, hum: .72, wv: 5.5, wd: 1.3, u: "moderate usage" },
+    { w: 5, sk: 3, pr: .55, hum: .81, wv: 7.2, wd: 1.8, u: "moderate usage" },
+    { w: 6, sk: 3, pr: .80, hum: .90, wv: 9.4, wd: 2.4, u: "high usage" },
+    { w: 7, sk: 3, pr: 1.0, hum: .96, wv: 11.1, wd: 3.0, u: "high usage" },
+    { w: 6, sk: 3, pr: .30, hum: .88, wv: 8.0, wd: 3.3, u: "high usage" },
+    { w: 4, sk: 2, pr: 0,   hum: .70, wv: 5.0, wd: 4.0, u: "max usage" },
+    { w: 2, sk: 1, pr: 0,   hum: .55, wv: 3.1, wd: 5.0, u: "max usage" }
+  ];
+  var si = 0, yaw = 0;
+  function nextScene() {
+    var sc = scenes[si++ % scenes.length];
+    state.TrackWetness = sc.w; state.Skies = sc.sk; state.Precipitation = sc.pr;
+    state.RelativeHumidity = sc.hum; state.WindVel = sc.wv; state.WindDir = sc.wd;
+    state.SessionNum = 0;
+    state.SessionInfo = "SessionTrackRubberState: " + sc.u;
+    var sl0 = $("slider");
+    if (sl0) {
+      sl0.value = sc.w; $("slval").textContent = sc.w;
+      $("skysl").value = sc.sk; $("skval").textContent = ["Clear", "Partly cloudy", "Mostly cloudy", "Overcast"][sc.sk];
+      $("rainsl").value = Math.round(sc.pr * 100); $("rnval").textContent = Math.round(sc.pr * 100) + " %";
+    }
+    render();
+  }
+  setStatus("Demo – simulated data");
+  nextScene();
+  var auto = true, sl = $("slider"), btn = $("auto");
+  setInterval(function () { if (auto) nextScene(); }, 2800);
+  sl.addEventListener("input", function () {
+    auto = false;
+    btn.textContent = "Auto demo: off (click to resume)";
+    $("slval").textContent = sl.value;
+    state.TrackWetness = Number(sl.value);
+    render();
+  });
+  function manual(fn) {
+    return function () {
+      auto = false;
+      btn.textContent = "Auto demo: off (click to resume)";
+      fn();
+      render();
+    };
+  }
+  var SKY = ["Clear", "Partly cloudy", "Mostly cloudy", "Overcast"];
+  $("skysl").addEventListener("input", manual(function () {
+    var v = Number($("skysl").value);
+    $("skval").textContent = SKY[v];
+    state.Skies = v;
+  }));
+  $("rainsl").addEventListener("input", manual(function () {
+    var v = Number($("rainsl").value);
+    $("rnval").textContent = v + " %";
+    state.Precipitation = v / 100;
+  }));
+  btn.addEventListener("click", function () {
+    auto = !auto;
+    btn.textContent = auto ? "Auto demo: on (click to pause)" : "Auto demo: off (click to resume)";
+  });
+  setInterval(function () { yaw += 0.04; state.YawNorth = yaw; render(); }, 120); // car turning, arrow follows
+})();
+</script>
+</body>
+</html>
