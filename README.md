@@ -86,4 +86,6 @@ TrackStats is a plain `index.html` with no build step. Its only external request
 
 ---
 
+Released under the [MIT License](LICENSE).
+
 TrackStats is an unofficial fan project and is not affiliated with iRacing.com Motorsport Simulations or KAPPS.
