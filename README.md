@@ -1,16 +1,14 @@
-<p align="center">
-  <img src="assets/logo-animated.svg" alt="TrackStats logo" width="160">
-</p>
+<h1>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/header-dark.svg">
+    <img src="assets/header-light.svg" alt="TrackStats" height="72">
+  </picture>
+</h1>
 
-<h1 align="center">TrackStats</h1>
-
-<p align="center">
-  Small KAPPS add-on that shows live track stats in iRacing:<br>
-  wetness, rain, humidity, wind and track usage.
-</p>
+Small KAPPS add-on that shows live track stats in iRacing: wetness, rain, humidity, wind and track usage.
 
 <p align="center">
-  <img src="assets/screenshot.png" alt="TrackStats overlay" width="270">
+  <img src="assets/preview.gif" alt="TrackStats overlay running through the wetness levels, wind and track usage" width="300">
 </p>
 
 ## What it shows
