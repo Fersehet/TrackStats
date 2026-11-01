@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Track Wetness</title>
+<title>TrackStats</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,7 +12,7 @@
   #wx { font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif; }
   html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; font-family: "Roboto", "Segoe UI", Arial, sans-serif; color: #e8f1f7; }
   #panel { position: absolute; top: 0; left: 0; transform-origin: 0 0; width: 270px; padding: 12px 14px 10px; background: rgba(var(--rgb, 15, 19, 20), var(--bg, 1)); border-radius: 10px; box-sizing: border-box; }
-  #wx { position: absolute; top: 12px; right: 14px; font-size: 22px; line-height: 1.1;  }
+  #wx { position: absolute; top: 12px; right: 14px; font-size: 22px; line-height: 1.1; }
   #level { font-size: 22px; font-weight: 700; line-height: 1.1; }
   #trend { font-size: 13px; min-height: 17px; margin-top: 3px; color: #9fb3c2; }
   #trend.up { color: #ff8a65; }
@@ -120,7 +120,7 @@
     if (prevLevel !== null && lvl !== prevLevel && lvl > 0 && prevLevel > 0) trend = lvl > prevLevel ? 1 : -1;
     if (lvl > 0) prevLevel = lvl;
 
-    $("level").textContent = LABELS[lvl];
+    $("level").textContent = state.TrackWetness === undefined ? "Waiting for iRacing…" : LABELS[lvl];
     var t = $("trend");
     t.className = trend > 0 ? "up" : trend < 0 ? "down" : "";
     t.textContent = trend > 0 ? "▲ getting wetter" : trend < 0 ? "▼ drying" : "";
