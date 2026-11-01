@@ -1,7 +1,7 @@
 <h1>
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/header-dark.svg?v=2">
-    <img src="assets/header-light.svg?v=2" alt="TrackStats" height="72">
+    <source media="(prefers-color-scheme: dark)" srcset="assets/header-dark.svg?v=3">
+    <img src="assets/header-light.svg?v=3" alt="TrackStats" height="72">
   </picture>
 </h1>
 
