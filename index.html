@@ -13,17 +13,22 @@
   html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; font-family: "Roboto", "Segoe UI", Arial, sans-serif; color: #e8f1f7; }
   #panel { position: absolute; top: 0; left: 0; transform-origin: 0 0; width: 270px; padding: 12px 14px 10px; background: rgba(var(--rgb, 15, 19, 20), var(--bg, 1)); border-radius: 10px; box-sizing: border-box; }
   #wx { position: absolute; top: 12px; right: 14px; font-size: 22px; line-height: 1.1; }
+  #head { display: flex; align-items: center; gap: 8px; padding-right: 34px; }
   #level { font-size: 22px; font-weight: 700; line-height: 1.1; }
+  #led { flex: none; width: 9px; height: 9px; border-radius: 50%; background: #1c2022; box-shadow: inset 0 0 0 1px #2b3236; transition: background .3s, box-shadow .3s; }
+  #led.on { background: #1e84ff; box-shadow: 0 0 6px 1px rgba(30, 132, 255, .75); }
+  #led.hide { display: none; }
   #trend { font-size: 13px; min-height: 17px; margin-top: 3px; color: #9fb3c2; }
   #trend.up { color: #ff8a65; }
   #trend.down { color: #7bd88f; }
   #bar { display: flex; gap: 4px; margin: 10px 0 12px; }
   #bar i { flex: 1; height: 10px; border-radius: 3px; background: #1d2a35; }
   #bar i.on { background: var(--c); }
-  .row { display: flex; justify-content: space-between; font-size: 14px; padding: 2px 0; font-variant-numeric: tabular-nums; }
+  .row { display: flex; justify-content: space-between; align-items: center; font-size: 14px; padding: 2px 0; font-variant-numeric: tabular-nums; }
   .row span:first-child { color: #9fb3c2; }
   #wind { display: flex; align-items: center; gap: 8px; }
-  #arrow { transition: transform .3s; }
+  #wspd { font-weight: 400; }
+  #arrow { transition: transform .3s; margin: -4px 0; } /* arrow must not make the wind row taller */
   #status { margin-top: 8px; font-size: 11px; color: #6c808f; }
   #raw { margin-top: 6px; font-size: 10px; line-height: 1.3; color: #6c808f; word-break: break-all; max-height: 90px; overflow: hidden; }
 </style>
@@ -31,11 +36,12 @@
 <body>
 <div id="panel">
   <div id="wx"></div>
-  <div id="level">Waiting for iRacing…</div>
+  <div id="head"><i id="led" class="hide" title="Declared wet"></i><span id="level">Waiting for iRacing…</span></div>
   <div id="trend"></div>
   <div id="bar"></div>
   <div class="row"><span>Rain</span><span id="rain">–</span></div>
   <div class="row"><span>Humidity</span><span id="hum">–</span></div>
+  <div class="row"><span>Fog</span><span id="fog">–</span></div>
   <div class="row"><span>Wind</span><span id="wind"><svg id="arrow" viewBox="-12 -12 24 24" width="22" height="22"><path d="M0 -10 L7 8 L0 4 L-7 8 Z" fill="#8fd3f4"/></svg><b id="wspd">–</b></span></div>
   <div class="row"><span>Track usage</span><span id="rubber">–</span></div>
   <div id="status">Connecting…</div>
@@ -44,7 +50,7 @@
 
 <script>
 (function () {
-  var PARAMS = ["TrackWetness", "Precipitation", "RelativeHumidity", "WindDir", "WindVel", "YawNorth", "SessionNum", "SessionInfo", "Skies"];
+  var PARAMS = ["TrackWetness", "Precipitation", "RelativeHumidity", "WindDir", "WindVel", "YawNorth", "SessionNum", "SessionInfo", "Skies", "WeatherDeclaredWet", "FogLevel"];
   // iRacing: 1 = dry ... 7 = extremely wet
   var LABELS = ["Unknown", "Dry", "Mostly dry", "Very lightly wet", "Lightly wet", "Moderately wet", "Very wet", "Extremely wet"];
   var COLORS = ["#8fd3f4", "#5bb6ec", "#3b9be0", "#2f7fd1", "#3a63c4", "#4a49b0"]; // levels 2..7
@@ -121,6 +127,9 @@
     if (lvl > 0) prevLevel = lvl;
 
     $("level").textContent = state.TrackWetness === undefined ? "Waiting for iRacing…" : LABELS[lvl];
+    // LED in front of the label: lit while race control has declared the session wet
+    var dw = state.WeatherDeclaredWet;
+    $("led").className = state.TrackWetness === undefined ? "hide" : (dw === true || dw === 1 || dw === "1" || dw === "true") ? "on" : "";
     var t = $("trend");
     t.className = trend > 0 ? "up" : trend < 0 ? "down" : "";
     t.textContent = trend > 0 ? "▲ getting wetter" : trend < 0 ? "▼ drying" : "";
@@ -132,9 +141,10 @@
       segs[i].style.setProperty("--c", COLORS[i]);
     }
 
-    var p = Number(state.Precipitation), h = Number(state.RelativeHumidity);
+    var p = Number(state.Precipitation), h = Number(state.RelativeHumidity), fg = Number(state.FogLevel);
     $("rain").textContent = isFinite(p) && state.Precipitation !== undefined ? Math.round(p * 100) + " %" : "–";
     $("hum").textContent = isFinite(h) && state.RelativeHumidity !== undefined ? Math.round(h * 100) + " %" : "–";
+    $("fog").textContent = isFinite(fg) && state.FogLevel !== undefined ? Math.round(fg * 100) + " %" : "–";
     var wd = Number(state.WindDir), wv = Number(state.WindVel), yaw = Number(state.YawNorth) || 0;
     if (state.WindVel !== undefined && isFinite(wv)) {
       $("wspd").textContent = Math.round(wv * 3.6) + " km/h";
