@@ -11,10 +11,11 @@
   * { font-family: "Roboto", "Segoe UI", Arial, sans-serif; }
   #wx { font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif; }
   html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; font-family: "Roboto", "Segoe UI", Arial, sans-serif; color: #e8f1f7; }
-  #panel { position: absolute; top: 0; left: 0; transform-origin: 0 0; width: 270px; padding: 12px 14px 10px; background: rgba(var(--rgb, 15, 19, 20), var(--bg, 1)); border-radius: 10px; box-sizing: border-box; }
+  #panel { position: absolute; top: 0; left: 0; transform-origin: 0 0; width: 260px; padding: 12px 14px 10px; background: rgba(var(--rgb, 15, 19, 20), var(--bg, 1)); border-radius: 10px; box-sizing: border-box; }
   #wx { position: absolute; top: 12px; right: 14px; font-size: 22px; line-height: 1.1; }
   #head { display: flex; align-items: center; gap: 8px; padding-right: 34px; }
   #level { font-size: 22px; font-weight: 700; line-height: 1.1; }
+  #level.wait { font-size: 17px; line-height: 24.2px; white-space: nowrap; } /* fits one line, same height */
   #led { flex: none; width: 9px; height: 9px; border-radius: 50%; background: #1c2022; box-shadow: inset 0 0 0 1px #2b3236; transition: background .3s, box-shadow .3s; }
   #led.on { background: #1e84ff; box-shadow: 0 0 6px 1px rgba(30, 132, 255, .75); }
   #led.hide { display: none; }
@@ -31,8 +32,8 @@
   #arrow { transition: transform .3s; }
   html.demo body { background: #16191d; overflow: auto; }
   html.demo #panel { position: relative; margin: 32px auto; transform: none !important; }
-  #status { margin-top: 8px; font-size: 11px; color: #6c808f; }
-  #ctrl { width: 270px; margin: 0 auto 32px; color: #9fb3c2; font-size: 13px; }
+  #status { margin-top: 5px; font-size: 11px; color: #6c808f; }
+  #ctrl { width: 260px; margin: 0 auto 32px; color: #9fb3c2; font-size: 13px; }
   #ctrl input[type=range] { width: 100%; margin: 8px 0 4px; accent-color: #5bb6ec; }
   #ctrl .lbl { display: flex; justify-content: space-between; }
   #ctrl button { margin-top: 10px; width: 100%; padding: 8px; border: 0; border-radius: 6px; background: #1d2a35; color: #e8f1f7; font-size: 13px; cursor: pointer; }
@@ -42,7 +43,7 @@
 <body>
 <div id="panel">
   <div id="wx"></div>
-  <div id="head"><i id="led" class="hide" title="Declared wet"></i><span id="level">Waiting for iRacing…</span></div>
+  <div id="head"><i id="led" class="hide" title="Declared wet"></i><span id="level" class="wait">Waiting for iRacing…</span></div>
   <div id="trend"></div>
   <div id="bar"></div>
   <div class="row"><span>Rain</span><span id="rain">–</span></div>
@@ -146,6 +147,7 @@
     if (lvl > 0) prevLevel = lvl;
 
     $("level").textContent = state.TrackWetness === undefined ? "Waiting for iRacing…" : LABELS[lvl];
+    $("level").className = state.TrackWetness === undefined ? "wait" : "";
     // LED in front of the label: lit while race control has declared the session wet
     var dw = state.WeatherDeclaredWet;
     $("led").className = state.TrackWetness === undefined ? "hide" : (dw === true || dw === 1 || dw === "1" || dw === "true") ? "on" : "";

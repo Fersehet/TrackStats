@@ -8,7 +8,7 @@
 Small KAPPS add-on that shows live track stats in iRacing: wetness, rain, humidity, fog, wind and track usage.
 
 <p align="center">
-  <img src="assets/preview.gif?v=4" alt="TrackStats overlay running through the wetness levels, fog, wind and track usage" width="300">
+  <img src="assets/preview.gif?v=6" alt="TrackStats overlay running through the wetness levels, fog, wind and track usage" width="300">
 </p>
 
 ## What it shows
@@ -24,7 +24,7 @@ Small KAPPS add-on that shows live track stats in iRacing: wetness, rain, humidi
 | **Wind** | Arrow plus speed in km/h. The arrow is relative to your car: up means tailwind, down means headwind |
 | **Track usage** | Rubber state of the current session as reported by iRacing (for example *Low usage*, *High usage*) |
 
-The overlay scales with its window, so resizing it in KAPPS never adds scroll bars. It uses the Roboto font.
+The overlay is designed for 260 × 222 px and scales with its window, so resizing it in KAPPS never adds scroll bars. It uses the Roboto font.
 
 ## Install
 
@@ -43,6 +43,8 @@ The overlay scales with its window, so resizing it in KAPPS never adds scroll ba
    ```
 
 The folder name in the URL must match the folder name on disk.
+
+Set the overlay window in KAPPS to **260 × 222 px** to show it 1:1. Any other size scales it to fit.
 
 ## Options
 
