@@ -156,9 +156,10 @@
       }
     }
     $("rubber").textContent = trackUsage();
-    // Weather emoji: rain if it is currently raining, otherwise by cloud cover (Skies 0-3)
-    var sk = Number(state.Skies), pr = Number(state.Precipitation), em = "";
+    // Weather emoji: rain wins, then fog (20 % or more), otherwise by cloud cover (Skies 0-3)
+    var sk = Number(state.Skies), pr = Number(state.Precipitation), fo = Number(state.FogLevel), em = "";
     if (state.Precipitation !== undefined && isFinite(pr) && pr >= 0.05) em = "🌧️";
+    else if (state.FogLevel !== undefined && isFinite(fo) && fo >= 0.2) em = "🌁";
     else if (state.Skies !== undefined && isFinite(sk)) em = ["☀️", "🌤️", "⛅", "☁️"][Math.min(3, Math.max(0, Math.round(sk)))];
     $("wx").textContent = em;
     fit();
