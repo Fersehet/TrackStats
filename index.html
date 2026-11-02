@@ -26,9 +26,9 @@
   #bar i.on { background: var(--c); }
   .row { display: flex; justify-content: space-between; align-items: center; font-size: 14px; padding: 2px 0; font-variant-numeric: tabular-nums; }
   .row span:first-child { color: #9fb3c2; }
-  #wind { display: flex; align-items: center; gap: 8px; }
+  #wind { display: flex; align-items: center; gap: 6px; }
   #wspd { font-weight: 400; }
-  #arrow { transition: transform .3s; margin: -4px 0; } /* arrow must not make the wind row taller */
+  #arrow { transition: transform .3s; }
   #status { margin-top: 8px; font-size: 11px; color: #6c808f; }
   #raw { margin-top: 6px; font-size: 10px; line-height: 1.3; color: #6c808f; word-break: break-all; max-height: 90px; overflow: hidden; }
 </style>
@@ -42,7 +42,7 @@
   <div class="row"><span>Rain</span><span id="rain">–</span></div>
   <div class="row"><span>Humidity</span><span id="hum">–</span></div>
   <div class="row"><span>Fog</span><span id="fog">–</span></div>
-  <div class="row"><span>Wind</span><span id="wind"><svg id="arrow" viewBox="-12 -12 24 24" width="22" height="22"><path d="M0 -10 L7 8 L0 4 L-7 8 Z" fill="#8fd3f4"/></svg><b id="wspd">–</b></span></div>
+  <div class="row"><span>Wind</span><span id="wind"><svg id="arrow" viewBox="-12 -12 24 24" width="16" height="16"><path d="M0 -10 L7 8 L0 4 L-7 8 Z" fill="#8fd3f4"/></svg><b id="wspd">–</b></span></div>
   <div class="row"><span>Track usage</span><span id="rubber">–</span></div>
   <div id="status">Connecting…</div>
   <div id="raw"></div>
