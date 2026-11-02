@@ -175,9 +175,10 @@
       }
     }
     $("rubber").textContent = trackUsage();
-    // Weather emoji: rain if it is currently raining, otherwise by cloud cover (Skies 0-3)
-    var sk = Number(state.Skies), pr = Number(state.Precipitation), em = "";
+    // Weather emoji: rain wins, then fog (20 % or more), otherwise by cloud cover (Skies 0-3)
+    var sk = Number(state.Skies), pr = Number(state.Precipitation), fo = Number(state.FogLevel), em = "";
     if (state.Precipitation !== undefined && isFinite(pr) && pr >= 0.05) em = "🌧️";
+    else if (state.FogLevel !== undefined && isFinite(fo) && fo >= 0.2) em = "🌁";
     else if (state.Skies !== undefined && isFinite(sk)) em = ["☀️", "🌤️", "⛅", "☁️"][Math.min(3, Math.max(0, Math.round(sk)))];
     $("wx").textContent = em;
   }
@@ -195,7 +196,7 @@
     { w: 6, sk: 3, pr: .80, hum: .90, fog: .25, wv: 9.4, wd: 2.4, u: "high usage" },
     { w: 7, sk: 3, pr: 1.0, hum: .96, fog: .35, wv: 11.1, wd: 3.0, u: "high usage" },
     { w: 6, sk: 3, pr: .30, hum: .88, fog: .20, wv: 8.0, wd: 3.3, u: "high usage" },
-    { w: 4, sk: 2, pr: 0,   hum: .70, fog: .10, wv: 5.0, wd: 4.0, u: "max usage" },
+    { w: 4, sk: 2, pr: 0,   hum: .70, fog: .30, wv: 5.0, wd: 4.0, u: "max usage" },
     { w: 2, sk: 1, pr: 0,   hum: .55, fog: 0, wv: 3.1, wd: 5.0, u: "max usage" }
   ];
   var si = 0, yaw = 0;
