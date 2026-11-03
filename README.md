@@ -8,7 +8,7 @@
 Small KAPPS add-on that shows live track stats in iRacing: wetness, rain, humidity, fog, wind and track usage.
 
 <p align="center">
-  <img src="assets/preview.gif?v=6" alt="TrackStats overlay running through the wetness levels, fog, wind and track usage" width="300">
+  <img src="assets/preview.gif?v=7" alt="TrackStats overlay running through the wetness levels, fog, wind and track usage" width="300">
 </p>
 
 ## What it shows
@@ -53,7 +53,7 @@ Add options to the end of the URL. Combine several with `&`.
 | Option | Example | Effect |
 | --- | --- | --- |
 | `opacity` | `?opacity=70` | Background opacity, 0 to 100 (or 0 to 1). Default is solid |
-| `color` | `?color=0f1314` | Background color as hex without `#`. Default `0f1314` |
+| `color` | `?color=0f0f0f` | Background color as hex without `#`. Default `0f0f0f` |
 | `flip` | `?flip=1` | Reverses the rotation of the wind arrow |
 | `norden` | `?norden=1` | Wind arrow shows the wind direction relative to north (north is up) instead of relative to your car |
 | `debug` | `?debug=1` | Shows the raw data KAPPS sends, useful when a value stays empty |
@@ -75,6 +75,19 @@ Example: `http://127.0.0.1:8182/TrackStats/?opacity=80&color=000000`
 ## Demo
 
 Download the repository and open `demo/index.html` in any browser (GitHub only shows its source). It runs on simulated weather and has sliders for wetness, sky, rain and fog plus a *Declared wet* switch, so you can preview every state without iRacing.
+
+## Troubleshooting
+
+| Problem | Fix |
+| --- | --- |
+| Overlay is blank or shows a 404 page | The folder name in the URL must match the folder on disk (`TrackStats`, not `TrackStats-main`). Check that the `CustomApps` folder is added in KAPPS, or that the folder sits in `%AppData%\Kapps\iRacingBrowserApps\apps\` |
+| Status stays *Connecting to ws://…* or *Disconnected – retrying…* | KAPPS is not running or its local server is not reachable. Start KAPPS (as administrator) and check that the URL uses `127.0.0.1:8182` |
+| Stuck on *Waiting for iRacing…* | KAPPS is connected but iRacing sends no data yet. Join a session (not just the menu) and wait a few seconds |
+| A single value shows `–` | iRacing is not sending that value right now. Add `?debug=1` to the URL to see the raw data |
+| Wind arrow turns the wrong way | Add `?flip=1`. Add `?norden=1` if you want north up instead of relative to your car |
+| Overlay looks blurry or too small | Set the overlay window to **260 × 222 px** to show it 1:1. Other sizes are scaled to fit |
+| Font looks different | Roboto loads from Google Fonts. Without internet it falls back to Segoe UI or Arial |
+| Weather icons look different from the preview | The icons are emojis and use your system's emoji font, so they look slightly different on each OS |
 
 ## Good to know
 
