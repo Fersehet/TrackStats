@@ -28,8 +28,11 @@
   .row { display: flex; justify-content: space-between; align-items: center; font-size: 14px; padding: 2px 0; font-variant-numeric: tabular-nums; }
   .row span:first-child { color: #9fb3c2; }
   #wind { display: flex; align-items: center; gap: 6px; }
-  #wspd { font-weight: 400; }
-  #arrow { transition: transform .3s; }
+  #wind.head { --wc: #ff8a65; } #wind.tail { --wc: #7bd88f; } #wind.cross { --wc: #8fd3f4; }
+  #wdir, #wspd { font-weight: 700; color: var(--wc, inherit); }
+  #wdir:empty { display: none; }
+  #arrow { transition: transform .3s; margin: -2px 0; } /* 20 px arrow, row height stays the same */
+  #arrow path { fill: var(--wc, #8fd3f4); }
   html.demo body { background: #16191d; overflow: auto; }
   html.demo #panel { position: relative; margin: 32px auto; transform: none !important; }
   #status { margin-top: 5px; font-size: 11px; color: #6c808f; }
@@ -49,7 +52,7 @@
   <div class="row"><span>Rain</span><span id="rain">–</span></div>
   <div class="row"><span>Humidity</span><span id="hum">–</span></div>
   <div class="row"><span>Fog</span><span id="fog">–</span></div>
-  <div class="row"><span>Wind</span><span id="wind"><svg id="arrow" viewBox="-12 -12 24 24" width="16" height="16"><path d="M0 -10 L7 8 L0 4 L-7 8 Z" fill="#8fd3f4"/></svg><b id="wspd">–</b></span></div>
+  <div class="row"><span>Wind</span><span id="wind"><svg id="arrow" viewBox="-12 -12 24 24" width="20" height="20"><path d="M0 -11.5 L8 -1.5 H3 V11 H-3 V-1.5 H-8 Z"/></svg><span id="wdir"></span><span id="wspd">–</span></span></div>
   <div class="row"><span>Track usage</span><span id="rubber">–</span></div>
   <div id="status">Demo – simulated data</div>
 </div>
@@ -174,6 +177,13 @@
         var rel = NORTH ? wd : wd - yaw;
         var deg = (FLIP ? -1 : 1) * rel * 180 / Math.PI + 180;
         $("arrow").style.transform = "rotate(" + deg + "deg)";
+        // Relative to the car: wind from ahead = headwind, from behind = tailwind, otherwise crosswind
+        var a = Math.abs(Math.atan2(Math.sin(wd - yaw), Math.cos(wd - yaw))) * 180 / Math.PI;
+        var kind = a <= 45 ? "head" : a >= 135 ? "tail" : "cross";
+        $("wind").className = kind;
+        $("wdir").textContent = { head: "Headwind", tail: "Tailwind", cross: "Crosswind" }[kind];
+      } else {
+        $("wind").className = ""; $("wdir").textContent = "";
       }
     }
     $("rubber").textContent = trackUsage();
