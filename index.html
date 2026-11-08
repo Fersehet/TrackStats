@@ -27,7 +27,6 @@
   #bar i.on { background: var(--c); }
   .row { display: flex; justify-content: space-between; align-items: center; font-size: 14px; padding: 2px 0; font-variant-numeric: tabular-nums; }
   .row span:first-child { color: #9fb3c2; }
-  #rubber, .row span:first-child { white-space: nowrap; }
   #wind { display: flex; align-items: center; gap: 6px; }
   #wind.head { --wc: #ff8a65; } #wind.tail { --wc: #7bd88f; } #wind.cross { --wc: #8fd3f4; }
   #wdir, #wspd { font-weight: 700; color: var(--wc, inherit); }
@@ -106,8 +105,6 @@
     for (var k in obj) { var r = raw(obj[k], key, (d || 0) + 1); if (r !== undefined) return r; }
     return undefined;
   }
-  // iRacing only sends the label, so the percentage is an estimate: the seven steps spread evenly from 0 to 100 %
-  var USAGE_PCT = { "clean": 0, "low usage": 17, "moderately low usage": 33, "moderate usage": 50, "moderately high usage": 67, "high usage": 83, "max usage": 100 };
   function trackUsage() {
     var si = state.SessionInfo, n = Number(state.SessionNum) || 0, list = [], idx = 0;
     if (typeof si === "string") {
@@ -130,8 +127,7 @@
     for (var i = idx - 1; v === "carry over" && i >= 0; i--) {
       if (typeof list[i] === "string" && list[i].trim()) v = list[i].trim().toLowerCase();
     }
-    var label = v.replace(/\b\w/g, function (c) { return c.toUpperCase(); });
-    return v in USAGE_PCT ? label + " (" + USAGE_PCT[v] + " %)" : label;
+    return v.replace(/\b\w/g, function (c) { return c.toUpperCase(); });
   }
 
   function render() {
@@ -183,10 +179,6 @@
       }
     }
     $("rubber").textContent = trackUsage();
-    // Long labels like "Moderately High Usage (67 %)" get a smaller font so they stay on one line
-    var ru = $("rubber"), room = ru.parentNode.clientWidth - ru.previousElementSibling.offsetWidth - 8;
-    ru.style.fontSize = "";
-    for (var fs = 13; fs >= 10 && ru.offsetWidth > room; fs--) ru.style.fontSize = fs + "px";
     // Weather emoji: rain if it is currently raining, otherwise by cloud cover (Skies 0-3)
     var sk = Number(state.Skies), pr = Number(state.Precipitation), em = "";
     if (state.Precipitation !== undefined && isFinite(pr) && pr >= 0.05) em = "🌧️";
