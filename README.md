@@ -8,7 +8,7 @@
 Small KAPPS add-on that shows live track stats in iRacing: wetness, rain, humidity, fog, wind and track usage.
 
 <p align="center">
-  <img src="assets/preview.gif?v=10" alt="TrackStats overlay running through the wetness levels, fog, wind and track usage" width="300">
+  <img src="assets/preview.gif?v=11" alt="TrackStats overlay running through the wetness levels, fog, wind and track usage" width="300">
 </p>
 
 ## What it shows
@@ -74,7 +74,7 @@ Example: `http://127.0.0.1:8182/TrackStats/?opacity=80&color=000000`
 
 ## Demo
 
-Download the repository and open `demo/index.html` in any browser (GitHub only shows its source). It runs on simulated weather and has sliders for wetness, sky, rain and fog plus a *Declared wet* switch, so you can preview every state without iRacing.
+Download the repository and open `demo/index.html` in any browser (GitHub only shows its source). It runs on simulated weather and has sliders for wetness, sky, rain and fog plus a *Declared Wet* switch, so you can preview every state without iRacing.
 
 ## Troubleshooting
 
