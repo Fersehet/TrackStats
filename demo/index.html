@@ -57,9 +57,9 @@
   <div id="status">Demo – Simulated Data</div>
 </div>
 <div id="ctrl">
-  <div class="lbl"><span>Track wetness</span><span id="slval">1</span></div>
+  <div class="lbl"><span>Track Wetness</span><span id="slval">1</span></div>
   <input type="range" id="slider" min="1" max="7" step="1" value="1">
-  <div class="lbl"><span>Dry</span><span>Extremely wet</span></div>
+  <div class="lbl"><span>Dry</span><span>Extremely Wet</span></div>
   <div class="lbl" style="margin-top:14px"><span>Sky</span><span id="skval">Clear</span></div>
   <input type="range" id="skysl" min="0" max="3" step="1" value="0">
   <div class="lbl"><span>Clear</span><span>Overcast</span></div>
@@ -69,8 +69,8 @@
   <div class="lbl" style="margin-top:14px"><span>Fog</span><span id="fgval">0 %</span></div>
   <input type="range" id="fogsl" min="0" max="100" step="1" value="0">
   <div class="lbl"><span>None</span><span>Dense</span></div>
-  <label class="lbl" style="margin-top:14px;justify-content:flex-start;gap:8px;cursor:pointer"><input type="checkbox" id="dwcb" style="accent-color:#1e84ff;margin:0"><span>Declared wet</span></label>
-  <button id="auto">Auto demo: on (click to pause)</button>
+  <label class="lbl" style="margin-top:14px;justify-content:flex-start;gap:8px;cursor:pointer"><input type="checkbox" id="dwcb" style="accent-color:#1e84ff;margin:0"><span>Declared Wet</span></label>
+  <button id="auto">Auto Demo: On (Click To Pause)</button>
 </div>
 
 <script>
@@ -231,7 +231,7 @@
     var sl0 = $("slider");
     if (sl0) {
       sl0.value = sc.w; $("slval").textContent = sc.w;
-      $("skysl").value = sc.sk; $("skval").textContent = ["Clear", "Partly cloudy", "Mostly cloudy", "Overcast"][sc.sk];
+      $("skysl").value = sc.sk; $("skval").textContent = ["Clear", "Partly Cloudy", "Mostly Cloudy", "Overcast"][sc.sk];
       $("rainsl").value = Math.round(sc.pr * 100); $("rnval").textContent = Math.round(sc.pr * 100) + " %";
       $("dwcb").checked = sc.w >= 4;
       $("fogsl").value = Math.round(sc.fog * 100); $("fgval").textContent = Math.round(sc.fog * 100) + " %";
@@ -244,7 +244,7 @@
   setInterval(function () { if (auto) nextScene(); }, 2800);
   sl.addEventListener("input", function () {
     auto = false;
-    btn.textContent = "Auto demo: off (click to resume)";
+    btn.textContent = "Auto Demo: Off (Click To Resume)";
     $("slval").textContent = sl.value;
     state.TrackWetness = Number(sl.value);
     render();
@@ -252,12 +252,12 @@
   function manual(fn) {
     return function () {
       auto = false;
-      btn.textContent = "Auto demo: off (click to resume)";
+      btn.textContent = "Auto Demo: Off (Click To Resume)";
       fn();
       render();
     };
   }
-  var SKY = ["Clear", "Partly cloudy", "Mostly cloudy", "Overcast"];
+  var SKY = ["Clear", "Partly Cloudy", "Mostly Cloudy", "Overcast"];
   $("skysl").addEventListener("input", manual(function () {
     var v = Number($("skysl").value);
     $("skval").textContent = SKY[v];
@@ -278,7 +278,7 @@
   }));
   btn.addEventListener("click", function () {
     auto = !auto;
-    btn.textContent = auto ? "Auto demo: on (click to pause)" : "Auto demo: off (click to resume)";
+    btn.textContent = auto ? "Auto Demo: On (Click To Pause)" : "Auto Demo: Off (Click To Resume)";
   });
   setInterval(function () { yaw += 0.04; state.YawNorth = yaw; render(); }, 120); // car turning, arrow follows
 })();
