@@ -22,7 +22,7 @@ Small KAPPS add-on that shows live track stats in iRacing: wetness, rain, humidi
 | **Humidity** | Relative humidity in % |
 | **Fog** | Fog level in % |
 | **Wind** | Arrow, direction word and speed in km/h, relative to your car: orange *Headwind*, green *Tailwind*, blue *Crosswind*. The arrow shows where the wind blows: up means tailwind, down means headwind |
-| **Track usage** | Rubber state of the current session as reported by iRacing, with an estimated percentage (for example *Low Usage (17 %)*). For *Carry Over* it shows the usage carried over from the session before |
+| **Track usage** | Rubber state of the current session as reported by iRacing (for example *Low Usage*, *High Usage*). For *Carry Over* it shows the usage carried over from the session before |
 
 The overlay is designed for 260 × 222 px and scales with its window, so resizing it in KAPPS never adds scroll bars. It uses the Roboto font.
 
@@ -92,7 +92,7 @@ Download the repository and open `demo/index.html` in any browser (GitHub only s
 ## Good to know
 
 - iRacing reports one wetness value for the whole track, not per section.
-- Track usage is the text label iRacing provides. iRacing does not send a percentage, so the overlay estimates one by spreading the seven steps evenly: Clean 0 %, Low 17 %, Moderately Low 33 %, Moderate 50 %, Moderately High 67 %, High 83 %, Max 100 %. Long labels get a slightly smaller font so they fit on one line.
+- Track usage is the text label iRacing provides. iRacing does not send a percentage.
 - The overlay shows *Waiting For iRacing…* until data arrives. A single value shows `–` when iRacing is not sending it, for example outside a session.
 
 ## How it works
