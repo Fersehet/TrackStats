@@ -87,6 +87,7 @@
     if (obj === null || typeof obj !== "object" || (depth || 0) > 4) return undefined;
     if (Object.prototype.hasOwnProperty.call(obj, key)) return normalize(obj[key]);
     for (var k in obj) {
+      if (k === "SessionInfo") continue; // it repeats telemetry names (Skies, FogLevel, SessionNum ...) with other values
       var r = find(obj[k], key, (depth || 0) + 1);
       if (r !== undefined) return r;
     }
