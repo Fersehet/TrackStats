@@ -10,7 +10,7 @@
 <style>
   * { font-family: "Roboto", "Segoe UI", Arial, sans-serif; }
   #wx { font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif; }
-  html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; font-family: "Roboto", "Segoe UI", Arial, sans-serif; color: #e8f1f7; }
+  html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; color: #e8f1f7; }
   #panel { position: absolute; top: 0; left: 0; transform-origin: 0 0; width: 260px; padding: 12px 14px 10px; background: rgba(var(--rgb, 15, 15, 15), var(--bg, 1)); border-radius: 10px; box-sizing: border-box; }
   #wx { position: absolute; top: 12px; right: 14px; font-size: 22px; line-height: 1.1; }
   #head { display: flex; align-items: center; gap: 8px; padding-right: 34px; }
@@ -100,22 +100,6 @@
   var bar = $("bar");
   for (var i = 0; i < 6; i++) bar.appendChild(document.createElement("i"));
 
-  // Finds a key anywhere in the JSON so the overlay copes with different message formats
-  function find(obj, key, depth) {
-    if (obj === null || typeof obj !== "object" || (depth || 0) > 4) return undefined;
-    if (Object.prototype.hasOwnProperty.call(obj, key)) return normalize(obj[key]);
-    for (var k in obj) {
-      var r = find(obj[k], key, (depth || 0) + 1);
-      if (r !== undefined) return r;
-    }
-    return undefined;
-  }
-  function normalize(v) {
-    if (Array.isArray(v)) return normalize(v[0]);
-    if (v && typeof v === "object" && "value" in v) return v.value;
-    return v;
-  }
-
   // Track usage = rubber state of the current session (from the iRacing session info)
   function raw(obj, key, d) {
     if (obj === null || typeof obj !== "object" || (d || 0) > 4) return undefined;
@@ -204,9 +188,6 @@
     $("wx").textContent = em;
   }
 
-  function setStatus(s) { $("status").textContent = s; }
-
-
   // ---- Demo: simulated weather, no iRacing needed ----
   var scenes = [
     { w: 1, sk: 0, pr: 0,   hum: .42, fog: 0, wv: 2.2, wd: .5,  u: "carry over" },
@@ -220,7 +201,7 @@
     { w: 4, sk: 2, pr: 0,   hum: .70, fog: .10, wv: 5.0, wd: 4.0, u: "max usage" },
     { w: 2, sk: 1, pr: 0,   hum: .55, fog: 0, wv: 3.1, wd: 5.0, u: "max usage" }
   ];
-  var si = 0, yaw = 0;
+  var si = 0, yaw = 0, SKY = ["Clear", "Partly Cloudy", "Mostly Cloudy", "Overcast"];
   function nextScene() {
     var sc = scenes[si++ % scenes.length];
     state.TrackWetness = sc.w; state.Skies = sc.sk; state.Precipitation = sc.pr;
@@ -231,14 +212,13 @@
     var sl0 = $("slider");
     if (sl0) {
       sl0.value = sc.w; $("slval").textContent = sc.w;
-      $("skysl").value = sc.sk; $("skval").textContent = ["Clear", "Partly Cloudy", "Mostly Cloudy", "Overcast"][sc.sk];
+      $("skysl").value = sc.sk; $("skval").textContent = SKY[sc.sk];
       $("rainsl").value = Math.round(sc.pr * 100); $("rnval").textContent = Math.round(sc.pr * 100) + " %";
       $("dwcb").checked = sc.w >= 4;
       $("fogsl").value = Math.round(sc.fog * 100); $("fgval").textContent = Math.round(sc.fog * 100) + " %";
     }
     render();
   }
-  setStatus("Demo – Simulated Data");
   nextScene();
   var auto = true, sl = $("slider"), btn = $("auto");
   setInterval(function () { if (auto) nextScene(); }, 2800);
@@ -257,7 +237,6 @@
       render();
     };
   }
-  var SKY = ["Clear", "Partly Cloudy", "Mostly Cloudy", "Overcast"];
   $("skysl").addEventListener("input", manual(function () {
     var v = Number($("skysl").value);
     $("skval").textContent = SKY[v];
