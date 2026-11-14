@@ -22,6 +22,10 @@
   #trend { font-size: 13px; min-height: 17px; margin-top: 3px; color: #9fb3c2; }
   #trend.up { color: #ff8a65; }
   #trend.down { color: #7bd88f; }
+  #rtr { font-size: 11px; margin-right: 5px; }
+  #rtr.up { color: #ff8a65; }
+  #rtr.down { color: #7bd88f; }
+  #rtr:empty { display: none; }
   #bar { display: flex; gap: 4px; margin: 10px 0 12px; }
   #bar i { flex: 1; height: 10px; border-radius: 3px; background: #1d2a35; }
   #bar i.on { background: var(--c); }
@@ -44,7 +48,7 @@
   <div id="head"><i id="led" class="hide" title="Declared Wet"></i><span id="level" class="wait">Waiting For iRacing…</span></div>
   <div id="trend"></div>
   <div id="bar"></div>
-  <div class="row"><span>Rain</span><span id="rain">–</span></div>
+  <div class="row"><span>Rain</span><span><span id="rtr"></span><span id="rain">–</span></span></div>
   <div class="row"><span>Humidity</span><span id="hum">–</span></div>
   <div class="row"><span>Fog</span><span id="fog">–</span></div>
   <div class="row"><span>Wind</span><span id="wind"><svg id="arrow" viewBox="-12 -12 24 24" width="20" height="20"><path d="M0 -11.5 L8 -1.5 H3 V11 H-3 V-1.5 H-8 Z"/></svg><span id="wdir"></span><span id="wspd">–</span></span></div>
@@ -76,6 +80,7 @@
   var NORTH = /[?&]norden=1/.test(location.search); // arrow points north instead of relative to the car
   var FLIP = /[?&]flip=1/.test(location.search);   // reverse rotation if the arrow is mirrored
 
+  var rainHist = [], RAIN_WIN = 60000; // rain samples for the trend arrow
   var state = {}, prevLevel = null, trend = 0, arrowDeg = 0, ws = null;
   var $ = function (id) { return document.getElementById(id); };
 
@@ -159,6 +164,16 @@
 
     var p = Number(state.Precipitation), h = Number(state.RelativeHumidity), fg = Number(state.FogLevel);
     $("rain").textContent = isFinite(p) && state.Precipitation !== undefined ? Math.round(p * 100) + " %" : "–";
+    // Rain trend arrow: compare with the rain about a minute ago (one sample per second)
+    var now = Date.now(), rt = "";
+    if (isFinite(p) && state.Precipitation !== undefined) {
+      if (!rainHist.length || now - rainHist[rainHist.length - 1].t >= 1000) rainHist.push({ t: now, v: p });
+      while (rainHist.length > 1 && now - rainHist[1].t >= RAIN_WIN) rainHist.shift();
+      var dp = p - rainHist[0].v;
+      rt = dp >= 0.0199 ? "up" : dp <= -0.0199 ? "down" : ""; // 2 points, tolerant of float rounding
+    } else rainHist = [];
+    $("rtr").className = rt;
+    $("rtr").textContent = rt === "up" ? "▲" : rt === "down" ? "▼" : "";
     $("hum").textContent = isFinite(h) && state.RelativeHumidity !== undefined ? Math.round(h * 100) + " %" : "–";
     $("fog").textContent = isFinite(fg) && state.FogLevel !== undefined ? Math.round(fg * 100) + " %" : "–";
     var wd = Number(state.WindDir), wv = Number(state.WindVel), yaw = Number(state.YawNorth) || 0;
